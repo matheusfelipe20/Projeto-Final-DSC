@@ -42,7 +42,7 @@ public class UsuarioController {
         return usuarioServico.CadastroUsuario(userRequestDTO);
     }
 
-    @DeleteMapping("/api/admin/usuarios/{email}")
+    @DeleteMapping("/api/perfil/{email}/remover")
     @ResponseStatus(code=HttpStatus.OK)
     public UsuarioResponseDTO RemoverUsuario(@PathVariable String email, @RequestHeader("Authorization") String header) {
         return usuarioServico.RemoverUsuario(email, header);

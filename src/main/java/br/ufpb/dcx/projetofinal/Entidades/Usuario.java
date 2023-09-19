@@ -22,11 +22,11 @@ public class Usuario {
     private String senha;
     private String nome;
     private String telefone;
-    private String classe;
+    private ClasseUser classe;
     private String documento;
     private RoleUser roleUser;
 
-    public Usuario (String email, String senha, String nome, String telefone, String classe, String documento, RoleUser roleUser) {
+    public Usuario (String email, String senha, String nome, String telefone, ClasseUser classe, String documento, RoleUser roleUser) {
         this.email = email;
         this.senha = senha;
         this.nome = nome;

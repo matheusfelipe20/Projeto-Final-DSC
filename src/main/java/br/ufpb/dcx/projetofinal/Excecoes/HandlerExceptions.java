@@ -83,4 +83,16 @@ public class HandlerExceptions {
 				.build();
 		return new ResponseEntity<>(problem, HttpStatus.BAD_REQUEST);
 	}
+
+	@ExceptionHandler(InvalidDocumentException.class)
+	public ResponseEntity<ProblemaDetalhado> InvalidDocumentException(InvalidDocumentException pyr) {
+		ProblemaDetalhado problem = ProblemaDetalhado
+				.builder()
+				.status(HttpStatus.BAD_REQUEST.value())
+				.tipo(DISCIPLINE_URI)
+				.titulo(pyr.gettitle())
+				.detalhe(pyr.getdetails())
+				.build();
+		return new ResponseEntity<>(problem, HttpStatus.BAD_REQUEST);
+	}
 }

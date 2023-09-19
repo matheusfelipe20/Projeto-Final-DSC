@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.util.List;
 
+import br.ufpb.dcx.projetofinal.Entidades.ClasseUser;
 import br.ufpb.dcx.projetofinal.Entidades.RoleUser;
 import br.ufpb.dcx.projetofinal.Entidades.Usuario;
 
@@ -24,7 +25,7 @@ public class UsuarioResponseDTO {
     String senha;
     String nome;
     String telefone;
-    String classe;
+    ClasseUser classe;
     String documento;
 
     RoleUser roleUser;

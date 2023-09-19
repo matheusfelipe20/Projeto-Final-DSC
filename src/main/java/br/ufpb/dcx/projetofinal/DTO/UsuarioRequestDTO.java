@@ -2,6 +2,7 @@ package br.ufpb.dcx.projetofinal.DTO;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import br.ufpb.dcx.projetofinal.Entidades.ClasseUser;
 import br.ufpb.dcx.projetofinal.Entidades.RoleUser;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -29,7 +30,7 @@ public class UsuarioRequestDTO {
 
     @JsonProperty("classe_usuario")
     @NotNull
-    private String classe;
+    private ClasseUser classe;
 
     @JsonProperty("documento_usuario")
     @NotNull
