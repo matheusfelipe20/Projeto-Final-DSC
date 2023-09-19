@@ -3,6 +3,7 @@ package br.ufpb.dcx.projetofinal.Servicos;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import br.ufpb.dcx.projetofinal.DTO.LoginUsuarioDTO;
@@ -74,13 +75,34 @@ public class UsuarioServico {
         return usuarioEncontrado.isPresent() && usuarioEncontrado.get().getEmail().equals(email);
     }
 
+    public ResponseEntity<String> AtualizarUsuario (String email, String novoNome, String authHeader) {
+        Usuario usuario = usuarioRepositorio.findByEmail(email)
+            .orElseThrow(() -> new NotFoundUserException("Erro de requisição - Email não encontrado", "Não foi possível realizar a ação, pois o email não está correto"));
+
+        Usuario usuarioLogado = this.getUser(jwtService.getTokenSubject(authHeader));
+        if(usuarioLogado.getRoleUser().equals(RoleUser.USER) || usuarioLogado.getRoleUser().equals(RoleUser.ADMIN)) {
+            // if (usuarioRepositorio.existsByEmail(novoEmail)) {
+            //     throw new DuplicateEmailException("Erro de Requisição", "O email de usuário já está em uso");
+            // }
+            //usuario.setEmail(novoEmail);
+
+            usuario.setNome(novoNome);
+
+            usuarioRepositorio.save(usuario);
+
+            return ResponseEntity.ok("usuario atualizada com sucesso.");
+        }
+        else  throw new NotAuthorizedException("Não Autorizado","Esse usuário não tem permissão para essa função");
+    }
+
     public UsuarioResponseDTO RemoverUsuario(String email, String authHeader) {
-        Usuario userToBeDeleted = this.getUser(email);
-        Usuario userLogged = this.getUser(jwtService.getTokenSubject(authHeader));
-        if(userLogged.getRoleUser().equals(RoleUser.ADMIN) ||
-                userLogged.getEmail().equals(userToBeDeleted.getEmail()))
-            usuarioRepositorio.delete(userToBeDeleted);
-        else  throw new NotAuthorizedException("Erro de Autorização","Esse usuário não tem permissão para acessar esse conteúdo");
-        return UsuarioResponseDTO.from(userToBeDeleted);
+        Usuario usuarioLogado = this.getUser(jwtService.getTokenSubject(authHeader));
+    
+        if (usuarioLogado.getEmail().equals(email)) {
+            usuarioRepositorio.delete(usuarioLogado);
+            return UsuarioResponseDTO.from(usuarioLogado);
+        } else {
+            throw new NotAuthorizedException("Erro de Autorização","Esse usuário não tem permissão para acessar esse conteúdo");
+        }
     }
 }
