@@ -20,5 +20,5 @@ public class CampanhaRequestDTO {
 
     @JsonProperty("meta_campanha")
     @NotNull
-    private double meta;
+    private Double meta;
 }

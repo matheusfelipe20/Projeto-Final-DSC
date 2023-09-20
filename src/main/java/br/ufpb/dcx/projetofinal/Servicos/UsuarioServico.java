@@ -12,6 +12,7 @@ import br.ufpb.dcx.projetofinal.DTO.UsuarioResponseDTO;
 import br.ufpb.dcx.projetofinal.Entidades.ClasseUser;
 import br.ufpb.dcx.projetofinal.Entidades.RoleUser;
 import br.ufpb.dcx.projetofinal.Entidades.Usuario;
+import br.ufpb.dcx.projetofinal.Excecoes.DuplicateEmailException;
 import br.ufpb.dcx.projetofinal.Excecoes.InvalidDocumentException;
 import br.ufpb.dcx.projetofinal.Excecoes.NotAuthorizedException;
 import br.ufpb.dcx.projetofinal.Excecoes.NotFoundUserException;
@@ -136,16 +137,16 @@ public class UsuarioServico {
         return usuarioEncontrado.isPresent() && usuarioEncontrado.get().getEmail().equals(email);
     }
 
-    public ResponseEntity<String> AtualizarUsuario (String email, String novoNome, String authHeader) {
+    public ResponseEntity<String> AtualizarUsuario (String email, String novoNome, String novoEmail, String authHeader) {
         Usuario usuario = usuarioRepositorio.findByEmail(email)
             .orElseThrow(() -> new NotFoundUserException("Erro de requisição - Email não encontrado", "Não foi possível realizar a ação, pois o email não está correto"));
 
         Usuario usuarioLogado = this.getUser(jwtService.getTokenSubject(authHeader));
         if(usuarioLogado.getRoleUser().equals(RoleUser.USER) || usuarioLogado.getRoleUser().equals(RoleUser.ADMIN)) {
-            // if (usuarioRepositorio.existsByEmail(novoEmail)) {
-            //     throw new DuplicateEmailException("Erro de Requisição", "O email de usuário já está em uso");
-            // }
-            //usuario.setEmail(novoEmail);
+            if (usuarioRepositorio.existsByEmail(novoEmail)) {
+                throw new DuplicateEmailException("Erro de Requisição", "O email de usuário já está em uso");
+            }
+            usuario.setEmail(novoEmail);
 
             usuario.setNome(novoNome);
 

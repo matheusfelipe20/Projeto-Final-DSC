@@ -25,15 +25,15 @@ public class UsuarioController {
     @Autowired
     UsuarioServico usuarioServico;
 
-    @GetMapping("/api/perfil/{email}")
+    @GetMapping("/api/usuarios/perfil/{email}")
     @ResponseStatus(code= HttpStatus.OK)
     public UsuarioResponseDTO getUser(@PathVariable String email, @RequestHeader("Authorization") String header) {
         return usuarioServico.getUserByEmail(email, header);
     }
 
-    @PatchMapping("/api/perfil/{email}/atualizar")
+    @PatchMapping("/api/usuarios/perfil/{email}")
     public ResponseEntity<String> atualizarUsuario(@PathVariable String email, @RequestBody UsuarioRequestDTO usuarioRequestDTO, @RequestHeader("Authorization") String header) {
-        return usuarioServico.AtualizarUsuario(email, usuarioRequestDTO.getNome(), header);
+        return usuarioServico.AtualizarUsuario(email, usuarioRequestDTO.getNome(),usuarioRequestDTO.getEmail(), header);
     }
 
     @PostMapping("/api/cadastro")
@@ -42,7 +42,7 @@ public class UsuarioController {
         return usuarioServico.CadastroUsuario(userRequestDTO);
     }
 
-    @DeleteMapping("/api/perfil/{email}/remover")
+    @DeleteMapping("/api/usuarios/perfil/{email}")
     @ResponseStatus(code=HttpStatus.OK)
     public UsuarioResponseDTO RemoverUsuario(@PathVariable String email, @RequestHeader("Authorization") String header) {
         return usuarioServico.RemoverUsuario(email, header);

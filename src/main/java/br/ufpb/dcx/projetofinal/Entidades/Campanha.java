@@ -1,6 +1,6 @@
 package br.ufpb.dcx.projetofinal.Entidades;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,7 +25,16 @@ public class Campanha {
     private String estado;
     private String titulo;
     private String descricao;
-    private double meta;
-    private Date dataInicio;
-    private Date dataFinal;
+    private Double meta;
+    private LocalDateTime dataInicio;
+    private LocalDateTime dataFinal;
+
+    public Campanha(String estado, String titulo, String descricao, Double meta, LocalDateTime dataInicio, LocalDateTime dataFinal) {
+        this.estado = estado;
+        this.titulo = titulo;
+        this.descricao = descricao;
+        this.meta = meta;
+        this.dataInicio = dataInicio;
+        this.dataFinal = dataFinal;
+    }
 }
