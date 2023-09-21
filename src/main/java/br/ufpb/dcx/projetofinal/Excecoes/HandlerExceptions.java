@@ -119,4 +119,40 @@ public class HandlerExceptions {
 				.build();
 		return new ResponseEntity<>(problem, HttpStatus.BAD_REQUEST);
 	}
+
+	@ExceptionHandler(InvalidCampaignDescription.class)
+	public ResponseEntity<ProblemaDetalhado> InvalidCampaignDescription(InvalidCampaignDescription pyr) {
+		ProblemaDetalhado problem = ProblemaDetalhado
+				.builder()
+				.status(HttpStatus.BAD_REQUEST.value())
+				.tipo(DISCIPLINE_URI)
+				.titulo(pyr.gettitle())
+				.detalhe(pyr.getdetails())
+				.build();
+		return new ResponseEntity<>(problem, HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(InvalidCampaignMeta.class)
+	public ResponseEntity<ProblemaDetalhado> InvalidCampaignMeta(InvalidCampaignMeta pyr) {
+		ProblemaDetalhado problem = ProblemaDetalhado
+				.builder()
+				.status(HttpStatus.BAD_REQUEST.value())
+				.tipo(DISCIPLINE_URI)
+				.titulo(pyr.gettitle())
+				.detalhe(pyr.getdetails())
+				.build();
+		return new ResponseEntity<>(problem, HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(InvalidEmailException.class)
+	public ResponseEntity<ProblemaDetalhado> InvalidEmailException(InvalidEmailException pyr) {
+		ProblemaDetalhado problem = ProblemaDetalhado
+				.builder()
+				.status(HttpStatus.BAD_REQUEST.value())
+				.tipo(DISCIPLINE_URI)
+				.titulo(pyr.gettitle())
+				.detalhe(pyr.getdetails())
+				.build();
+		return new ResponseEntity<>(problem, HttpStatus.BAD_REQUEST);
+	}
 }

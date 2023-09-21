@@ -1,6 +1,8 @@
 package br.ufpb.dcx.projetofinal.Servicos;
 
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import br.ufpb.dcx.projetofinal.Entidades.RoleUser;
 import br.ufpb.dcx.projetofinal.Entidades.Usuario;
 import br.ufpb.dcx.projetofinal.Excecoes.DuplicateEmailException;
 import br.ufpb.dcx.projetofinal.Excecoes.InvalidDocumentException;
+import br.ufpb.dcx.projetofinal.Excecoes.InvalidEmailException;
 import br.ufpb.dcx.projetofinal.Excecoes.NotAuthorizedException;
 import br.ufpb.dcx.projetofinal.Excecoes.NotFoundUserException;
 import br.ufpb.dcx.projetofinal.Excecoes.UserAlreadyExistsException;
@@ -34,6 +37,13 @@ public class UsuarioServico {
 
         if (userFound.isPresent()) {
             throw new UserAlreadyExistsException("Erro usuário já existente", "Já existe um usuário com esse email");
+        }
+        String email = usuarioRequestDTO.getEmail();
+        String regex = ".*@.*";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(email);
+        if (matcher.matches() == false) {
+            throw new InvalidEmailException("Erro Email Invalido", "É necessário que o Email seja com '@', por favor verifique novamente");
         }
 
         ClasseUser classe = usuarioRequestDTO.getClasse();

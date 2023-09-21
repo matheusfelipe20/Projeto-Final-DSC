@@ -1,11 +1,11 @@
 package br.ufpb.dcx.projetofinal.Entidades;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,10 +26,13 @@ public class Campanha {
     private String titulo;
     private String descricao;
     private Double meta;
-    private LocalDateTime dataInicio;
-    private LocalDateTime dataFinal;
+    private String dataInicio;
+    private String dataFinal;
+    @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
 
-    public Campanha(String estado, String titulo, String descricao, Double meta, LocalDateTime dataInicio, LocalDateTime dataFinal) {
+    public Campanha(String estado, String titulo, String descricao, Double meta, String dataInicio, String dataFinal) {
         this.estado = estado;
         this.titulo = titulo;
         this.descricao = descricao;

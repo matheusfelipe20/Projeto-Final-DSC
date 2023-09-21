@@ -1,0 +1,6 @@
+2023-09-20 21:55:49 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]USUARIO_ID CAMPANHA"; expected "UPDATE, USE"; SQL statement:
+USUARIO_ID CAMPANHA [42001-214]
+2023-09-20 21:55:52 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]USUARIO_ID CAMPANHA CAMPANHA"; expected "UPDATE, USE"; SQL statement:
+USUARIO_ID CAMPANHA CAMPANHA [42001-214]

@@ -1,6 +1,5 @@
 package br.ufpb.dcx.projetofinal.DTO;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import br.ufpb.dcx.projetofinal.Entidades.Campanha;
@@ -23,8 +22,8 @@ public class CampanhaResponseDTO {
     String titulo;
     String descricao;
     Double meta;
-    LocalDateTime dataInicio;
-    LocalDateTime dataFinal;
+    String dataInicio;
+    String dataFinal;
 
     public static CampanhaResponseDTO from(Campanha campanha) {
         return CampanhaResponseDTO.builder()
