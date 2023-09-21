@@ -1,5 +1,7 @@
 package br.ufpb.dcx.projetofinal.Servicos;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,8 @@ import br.ufpb.dcx.projetofinal.Excecoes.NotFoundUserException;
 import br.ufpb.dcx.projetofinal.Repositorio.CampanhaRepositorio;
 import br.ufpb.dcx.projetofinal.Repositorio.UsuarioRepositorio;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter; 
 
@@ -85,7 +89,6 @@ public class CampanhaServico {
         else throw new NotAuthorizedException("Não Autorizado","Esse usuário não tem permissão para essa função");
     }
 
-
     public CampanhaResponseDTO AtualizarCampanha(String titulo, CampanhaRequestDTO campanhaRequestDTO, String authHeader) {
         Usuario usuarioLogado = this.getUser(jwtService.getTokenSubject(authHeader));
 
@@ -116,7 +119,6 @@ public class CampanhaServico {
         }
     }
 
-
     public CampanhaResponseDTO DeletarCampanha(String titulo, String authHeader) {
         Usuario usuarioLogado = this.getUser(jwtService.getTokenSubject(authHeader));
 
@@ -135,7 +137,48 @@ public class CampanhaServico {
             throw new CampanhaNotFoundException("Campanha não encontrada", "A campanha com o título fornecido não foi encontrada.");
         }
     }
-    
+
+    public CampanhaResponseDTO EncerrarCampanha(String titulo, String authHeader) {
+        Usuario usuarioLogado = this.getUser(jwtService.getTokenSubject(authHeader));
+
+        Optional<Campanha> campanhaOptional = campanhaRepositorio.findByTitulo(titulo);
+
+        if (campanhaOptional.isPresent()) {
+            Campanha campanha = campanhaOptional.get();
+
+            if (campanha.getUsuario().equals(usuarioLogado)) {
+                campanha.setEstado("Encerrada");
+                Campanha campanhaAtualizada = campanhaRepositorio.save(campanha);
+
+                return CampanhaResponseDTO.from(campanhaAtualizada);
+            } else {
+                throw new NotAuthorizedException("Não Autorizado", "Você não tem permissão para encerrar esta campanha.");
+            }
+        } else {
+            throw new CampanhaNotFoundException("Campanha não encontrada", "A campanha com o título fornecido não foi encontrada.");
+        }
+    }
+
+    public void AtualizarEstadoDasCampanhasEncerradas() {
+        List<Campanha> campanhas = campanhaRepositorio.findByEstado("Ativa");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        String dataAtualTexto = dateFormat.format(new Date());
+        
+        for (Campanha campanha : campanhas) {
+            String dataFinalTexto = campanha.getDataFinal();
+            try {
+                Date dataFinal = dateFormat.parse(dataFinalTexto);
+                Date dataAtual = dateFormat.parse(dataAtualTexto);
+                
+                if (dataAtual.after(dataFinal)) {
+                    campanha.setEstado("Encerrada");
+                    campanhaRepositorio.save(campanha);
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 
     private Usuario getUser(String email) {

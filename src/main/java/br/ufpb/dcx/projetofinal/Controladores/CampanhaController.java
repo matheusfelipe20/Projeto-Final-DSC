@@ -38,4 +38,9 @@ public class CampanhaController {
     public CampanhaResponseDTO deletarCampanha(@PathVariable String titulo, @RequestHeader("Authorization") String authHeader) {
         return campanhaServico.DeletarCampanha(titulo, authHeader);
     }
+
+    @PatchMapping("api/campanha/Encerrar/{titulo}")
+    public CampanhaResponseDTO EncerrarCampanha(@PathVariable String titulo, @RequestHeader("Authorization") String authHeader) {
+        return campanhaServico.EncerrarCampanha(titulo, authHeader);
+    }
 }
