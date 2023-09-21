@@ -1,8 +1,10 @@
 package br.ufpb.dcx.projetofinal.Servicos;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -91,26 +93,29 @@ public class CampanhaServico {
 
     public CampanhaResponseDTO AtualizarCampanha(String titulo, CampanhaRequestDTO campanhaRequestDTO, String authHeader) {
         Usuario usuarioLogado = this.getUser(jwtService.getTokenSubject(authHeader));
-
+    
         Optional<Campanha> campanhaOptional = campanhaRepositorio.findByTitulo(titulo);
-
+    
         if (campanhaOptional.isPresent()) {
             Campanha campanha = campanhaOptional.get();
-
             if (campanha.getUsuario().equals(usuarioLogado)) {
-                String novoTitulo = campanhaRequestDTO.getTitulo();
-                
-                Optional<Campanha> campanhaComNovoTitulo = campanhaRepositorio.findByTitulo(novoTitulo);
-                if (campanhaComNovoTitulo.isPresent() && !campanhaComNovoTitulo.get().equals(campanha)) {
-                    throw new CampaignAlreadyExistsException("Título já existe", "Já existe uma campanha com o título fornecido.");
+                if ("Ativa".equals(campanha.getEstado())) {
+                    String novoTitulo = campanhaRequestDTO.getTitulo();
+                    
+                    Optional<Campanha> campanhaComNovoTitulo = campanhaRepositorio.findByTitulo(novoTitulo);
+                    if (campanhaComNovoTitulo.isPresent() && !campanhaComNovoTitulo.get().equals(campanha)) {
+                        throw new CampaignAlreadyExistsException("Título já existe", "Já existe uma campanha com o título fornecido.");
+                    }
+                    
+                    campanha.setTitulo(novoTitulo);
+                    campanha.setDescricao(campanhaRequestDTO.getDescricao());
+                    campanha.setMeta(campanhaRequestDTO.getMeta());
+    
+                    Campanha campanhaAtualizada = campanhaRepositorio.save(campanha);
+                    return CampanhaResponseDTO.from(campanhaAtualizada);
+                } else {
+                    throw new NotAuthorizedException("Não Autorizado", "Essa campanha está Encerrada");
                 }
-                
-                campanha.setTitulo(novoTitulo);
-                campanha.setDescricao(campanhaRequestDTO.getDescricao());
-                campanha.setMeta(campanhaRequestDTO.getMeta());
-
-                Campanha campanhaAtualizada = campanhaRepositorio.save(campanha);
-                return CampanhaResponseDTO.from(campanhaAtualizada);
             } else {
                 throw new NotAuthorizedException("Não Autorizado", "Você não tem permissão para atualizar esta campanha.");
             }
@@ -178,6 +183,31 @@ public class CampanhaServico {
                 e.printStackTrace();
             }
         }
+    }
+
+
+    public List<CampanhaResponseDTO> listarCampanhasAtivasPorTitulo() {
+        List<Campanha> campanhasAtivasPorTitulo = campanhaRepositorio.findByEstado("Ativa");
+        campanhasAtivasPorTitulo.sort(Comparator.comparing(Campanha::getTitulo));
+        return campanhasAtivasPorTitulo.stream()
+            .map(CampanhaResponseDTO::from)
+            .collect(Collectors.toList());
+    }
+    
+    public List<CampanhaResponseDTO> listarCampanhasAtivasPorDataCadastro() {
+        List<Campanha> campanhasAtivasPorDataCadastro = campanhaRepositorio.findByEstado("Ativa");
+        campanhasAtivasPorDataCadastro.sort(Comparator.comparing(Campanha::getDataInicio));
+        return campanhasAtivasPorDataCadastro.stream()
+            .map(CampanhaResponseDTO::from)
+            .collect(Collectors.toList());
+    }
+    
+    public List<CampanhaResponseDTO> listarCampanhasEncerradasPorDataCadastro() {
+        List<Campanha> campanhasEncerradasPorDataCadastro = campanhaRepositorio.findByEstado("Encerrada");
+        campanhasEncerradasPorDataCadastro.sort(Comparator.comparing(Campanha::getDataInicio));
+        return campanhasEncerradasPorDataCadastro.stream()
+            .map(CampanhaResponseDTO::from)
+            .collect(Collectors.toList());
     }
 
 
