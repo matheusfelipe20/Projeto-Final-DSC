@@ -11,6 +11,7 @@ import br.ufpb.dcx.projetofinal.Entidades.Campanha;
 import br.ufpb.dcx.projetofinal.Entidades.RoleUser;
 import br.ufpb.dcx.projetofinal.Entidades.Usuario;
 import br.ufpb.dcx.projetofinal.Excecoes.CampaignAlreadyExistsException;
+import br.ufpb.dcx.projetofinal.Excecoes.CampanhaNotFoundException;
 import br.ufpb.dcx.projetofinal.Excecoes.InvalidCampaignDescription;
 import br.ufpb.dcx.projetofinal.Excecoes.InvalidCampaignMeta;
 import br.ufpb.dcx.projetofinal.Excecoes.InvalidCampaignTitle;
@@ -83,6 +84,59 @@ public class CampanhaServico {
         }
         else throw new NotAuthorizedException("Não Autorizado","Esse usuário não tem permissão para essa função");
     }
+
+
+    public CampanhaResponseDTO AtualizarCampanha(String titulo, CampanhaRequestDTO campanhaRequestDTO, String authHeader) {
+        Usuario usuarioLogado = this.getUser(jwtService.getTokenSubject(authHeader));
+
+        Optional<Campanha> campanhaOptional = campanhaRepositorio.findByTitulo(titulo);
+
+        if (campanhaOptional.isPresent()) {
+            Campanha campanha = campanhaOptional.get();
+
+            if (campanha.getUsuario().equals(usuarioLogado)) {
+                String novoTitulo = campanhaRequestDTO.getTitulo();
+                
+                Optional<Campanha> campanhaComNovoTitulo = campanhaRepositorio.findByTitulo(novoTitulo);
+                if (campanhaComNovoTitulo.isPresent() && !campanhaComNovoTitulo.get().equals(campanha)) {
+                    throw new CampaignAlreadyExistsException("Título já existe", "Já existe uma campanha com o título fornecido.");
+                }
+                
+                campanha.setTitulo(novoTitulo);
+                campanha.setDescricao(campanhaRequestDTO.getDescricao());
+                campanha.setMeta(campanhaRequestDTO.getMeta());
+
+                Campanha campanhaAtualizada = campanhaRepositorio.save(campanha);
+                return CampanhaResponseDTO.from(campanhaAtualizada);
+            } else {
+                throw new NotAuthorizedException("Não Autorizado", "Você não tem permissão para atualizar esta campanha.");
+            }
+        } else {
+            throw new CampanhaNotFoundException("Campanha não encontrada", "A campanha com o título fornecido não foi encontrada.");
+        }
+    }
+
+
+    public CampanhaResponseDTO DeletarCampanha(String titulo, String authHeader) {
+        Usuario usuarioLogado = this.getUser(jwtService.getTokenSubject(authHeader));
+
+        Optional<Campanha> campanhaOptional = campanhaRepositorio.findByTitulo(titulo);
+
+        if (campanhaOptional.isPresent()) {
+            Campanha campanha = campanhaOptional.get();
+
+            if (campanha.getUsuario().equals(usuarioLogado)) {
+                campanhaRepositorio.delete(campanha);
+                return CampanhaResponseDTO.from(campanha);
+            } else {
+                throw new NotAuthorizedException("Não Autorizado", "Você não tem permissão para deletar esta campanha.");
+            }
+        } else {
+            throw new CampanhaNotFoundException("Campanha não encontrada", "A campanha com o título fornecido não foi encontrada.");
+        }
+    }
+    
+
 
     private Usuario getUser(String email) {
         Optional<Usuario> usuarioEncontrado = usuarioRepositorio.findByEmail(email);
