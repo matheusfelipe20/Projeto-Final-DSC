@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import br.ufpb.dcx.projetofinal.DTO.CampanhaRequestDTO;
 import br.ufpb.dcx.projetofinal.DTO.CampanhaResponseDTO;
 import br.ufpb.dcx.projetofinal.DTO.DoacaoRequestDTO;
+import br.ufpb.dcx.projetofinal.DTO.DoacaoResponseDTO;
 import br.ufpb.dcx.projetofinal.Entidades.Campanha;
 import br.ufpb.dcx.projetofinal.Entidades.Doacao;
 import br.ufpb.dcx.projetofinal.Entidades.RoleUser;
@@ -142,6 +143,12 @@ public class CampanhaServico {
             Campanha campanha = campanhaOptional.get();
 
             if (campanha.getUsuario().equals(usuarioLogado)) {
+                if (campanha.getSaldo() > 0) {
+                    String estadoDeletado = "Encerrada";
+                    campanha.setEstado(estadoDeletado);
+                    Campanha campanhaAtualizada = campanhaRepositorio.save(campanha);
+                    return CampanhaResponseDTO.from(campanhaAtualizada);
+                }
                 campanhaRepositorio.delete(campanha);
                 return CampanhaResponseDTO.from(campanha);
             } else {
@@ -218,6 +225,26 @@ public class CampanhaServico {
             .collect(Collectors.toList());
     }
 
+    public List<CampanhaResponseDTO> listarCampanhasPorMetaConcluida() {
+        List<Campanha> campanhas = campanhaRepositorio.findAll();
+        return campanhas.stream()
+            .filter(campanha -> campanha.getSaldo() >= campanha.getMeta())
+            .map(CampanhaResponseDTO::from)
+            .collect(Collectors.toList());
+    }
+
+    public List<DoacaoResponseDTO> listarHistoricoDoacoes() {
+        List<Doacao> doacoes = doacaoRepositorio.findAll();
+
+        //Esse trecho organizar as doações em ordem de datas crescentes
+        List<Doacao> doacoesOrdenadasPorData = doacoes.stream()
+            .sorted(Comparator.comparing(Doacao::getDataDoacao))
+            .collect(Collectors.toList());
+        
+        return doacoesOrdenadasPorData.stream()
+            .map(DoacaoResponseDTO::from)
+            .collect(Collectors.toList());
+    }
 
     private Usuario getUser(String email) {
         Optional<Usuario> usuarioEncontrado = usuarioRepositorio.findByEmail(email);
@@ -226,7 +253,6 @@ public class CampanhaServico {
         }
         throw new NotFoundUserException("Usuário não encontrado","Não existe um usuário com esse email");
     }
-
 
     public CampanhaResponseDTO realizarDoacao(String nomeCampanha, DoacaoRequestDTO doacaoRequestDTO, String authHeader) {
         Usuario usuarioDoador = this.getUser(jwtService.getTokenSubject(authHeader));

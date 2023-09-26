@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.ufpb.dcx.projetofinal.DTO.CampanhaRequestDTO;
 import br.ufpb.dcx.projetofinal.DTO.CampanhaResponseDTO;
 import br.ufpb.dcx.projetofinal.DTO.DoacaoRequestDTO;
+import br.ufpb.dcx.projetofinal.DTO.DoacaoResponseDTO;
 import br.ufpb.dcx.projetofinal.Servicos.CampanhaServico;
 import jakarta.validation.Valid;
 
@@ -67,8 +68,24 @@ public class CampanhaController {
         return ResponseEntity.ok(campanhas);
     }
 
+    @GetMapping("/api/campanha/meta")
+    public ResponseEntity<List<CampanhaResponseDTO>> listarCampanhasPorMetaConcluida() {
+        List<CampanhaResponseDTO> campanhas = campanhaServico.listarCampanhasPorMetaConcluida();
+        return ResponseEntity.ok(campanhas);
+    }
+
+    @GetMapping("/api/campanha/doacoes")
+    public ResponseEntity<List<DoacaoResponseDTO>> listarHistoricoDoacoes() {
+        List<DoacaoResponseDTO> doacoes = campanhaServico.listarHistoricoDoacoes();
+        return ResponseEntity.ok(doacoes);
+    }
+
     @PatchMapping("/api/campanha/{nomeCampanha}/doacao")
     public CampanhaResponseDTO doacaoCampanha(@PathVariable String nomeCampanha, @RequestBody DoacaoRequestDTO doacaoRequestDTO, @RequestHeader("Authorization") String authHeader) {
         return campanhaServico.realizarDoacao(nomeCampanha, doacaoRequestDTO, authHeader);
     }
+
+
+
+
 }

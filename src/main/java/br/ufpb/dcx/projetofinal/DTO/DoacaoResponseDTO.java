@@ -23,8 +23,6 @@ public class DoacaoResponseDTO {
     @JsonProperty("data_doacao")
     private String dataDoacao;
 
-    @JsonProperty("usuario_doador")
-    private String usuarioDoador;
 
     public static DoacaoResponseDTO from(Doacao doacao) {
         return DoacaoResponseDTO.builder()
@@ -32,7 +30,6 @@ public class DoacaoResponseDTO {
                 .nomeCampanha(doacao.getCampanha().getTitulo())
                 .valor(doacao.getValorDoado())
                 .dataDoacao(doacao.getDataDoacao())
-                .usuarioDoador(doacao.getUsuarioDoador().getNome())
                 .build();
     }
 }
