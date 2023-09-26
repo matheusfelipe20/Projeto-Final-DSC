@@ -16,6 +16,7 @@ public class AutenticacaoController {
     @Autowired
     private Autenticacao autenticacao;
 
+    //Realizar login de um usuario já cadastrado
     @PostMapping("api/login")
     @ResponseStatus(code= HttpStatus.OK)
     public ResponseLoginDTO auth(@RequestBody LoginUsuarioDTO user) {

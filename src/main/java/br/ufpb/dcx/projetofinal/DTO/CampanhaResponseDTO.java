@@ -24,7 +24,7 @@ public class CampanhaResponseDTO {
     Double meta;
     String dataInicio;
     String dataFinal;
-    Double saldo;
+    Double valorArrecadado;
 
     public static CampanhaResponseDTO from(Campanha campanha) {
         return CampanhaResponseDTO.builder()
@@ -35,7 +35,7 @@ public class CampanhaResponseDTO {
                 .meta(campanha.getMeta())
                 .dataInicio(campanha.getDataInicio())
                 .dataFinal(campanha.getDataFinal())
-                .saldo(campanha.getSaldo())
+                .valorArrecadado(campanha.getValorArrecadado())
                 .build();
     }
 

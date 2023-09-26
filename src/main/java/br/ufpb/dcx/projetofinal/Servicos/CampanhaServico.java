@@ -143,7 +143,7 @@ public class CampanhaServico {
             Campanha campanha = campanhaOptional.get();
 
             if (campanha.getUsuario().equals(usuarioLogado)) {
-                if (campanha.getSaldo() > 0) {
+                if (campanha.getValorArrecadado() > 0) {
                     String estadoDeletado = "Encerrada";
                     campanha.setEstado(estadoDeletado);
                     Campanha campanhaAtualizada = campanhaRepositorio.save(campanha);
@@ -228,7 +228,7 @@ public class CampanhaServico {
     public List<CampanhaResponseDTO> listarCampanhasPorMetaConcluida() {
         List<Campanha> campanhas = campanhaRepositorio.findAll();
         return campanhas.stream()
-            .filter(campanha -> campanha.getSaldo() >= campanha.getMeta())
+            .filter(campanha -> campanha.getValorArrecadado() >= campanha.getMeta())
             .map(CampanhaResponseDTO::from)
             .collect(Collectors.toList());
     }
@@ -236,7 +236,7 @@ public class CampanhaServico {
     public List<DoacaoResponseDTO> listarHistoricoDoacoes() {
         List<Doacao> doacoes = doacaoRepositorio.findAll();
 
-        //Esse trecho organizar as doações em ordem de datas crescentes
+        //IMPORTANTE: Esse trecho organizar as doações em ordem de datas crescentes
         List<Doacao> doacoesOrdenadasPorData = doacoes.stream()
             .sorted(Comparator.comparing(Doacao::getDataDoacao))
             .collect(Collectors.toList());
@@ -281,8 +281,8 @@ public class CampanhaServico {
         );
         doacaoRepositorio.save(novDoacao);
 
-        double novoSaldo = campanha.getSaldo() + valor;
-        campanha.setSaldo(novoSaldo);
+        double novoSaldo = campanha.getValorArrecadado() + valor;
+        campanha.setValorArrecadado(novoSaldo);
 
         campanhaRepositorio.save(campanha);
 
