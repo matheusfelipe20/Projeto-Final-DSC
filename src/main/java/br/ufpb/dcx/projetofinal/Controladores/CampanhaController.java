@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.ufpb.dcx.projetofinal.DTO.CampanhaRequestDTO;
 import br.ufpb.dcx.projetofinal.DTO.CampanhaResponseDTO;
+import br.ufpb.dcx.projetofinal.DTO.DoacaoRequestDTO;
 import br.ufpb.dcx.projetofinal.Servicos.CampanhaServico;
 import jakarta.validation.Valid;
 
@@ -64,5 +65,10 @@ public class CampanhaController {
     public ResponseEntity<List<CampanhaResponseDTO>> listarCampanhasEncerradasPorDataCadastro() {
         List<CampanhaResponseDTO> campanhas = campanhaServico.listarCampanhasEncerradasPorDataCadastro();
         return ResponseEntity.ok(campanhas);
+    }
+
+    @PatchMapping("/api/campanha/{nomeCampanha}/doacao")
+    public CampanhaResponseDTO doacaoCampanha(@PathVariable String nomeCampanha, @RequestBody DoacaoRequestDTO doacaoRequestDTO, @RequestHeader("Authorization") String authHeader) {
+        return campanhaServico.realizarDoacao(nomeCampanha, doacaoRequestDTO, authHeader);
     }
 }

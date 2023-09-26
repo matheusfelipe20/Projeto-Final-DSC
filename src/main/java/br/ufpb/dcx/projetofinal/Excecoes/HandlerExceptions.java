@@ -167,4 +167,16 @@ public class HandlerExceptions {
 				.build();
 		return new ResponseEntity<>(problem, HttpStatus.NOT_FOUND);
 	}
+
+	@ExceptionHandler(InvalidDonationAmountException.class)
+	public ResponseEntity<ProblemaDetalhado> InvalidDonationAmountException(InvalidDonationAmountException pyr) {
+		ProblemaDetalhado problem = ProblemaDetalhado
+				.builder()
+				.status(HttpStatus.BAD_REQUEST.value())
+				.tipo(DISCIPLINE_URI)
+				.titulo(pyr.gettitle())
+				.detalhe(pyr.getdetails())
+				.build();
+		return new ResponseEntity<>(problem, HttpStatus.BAD_REQUEST);
+	}
 }

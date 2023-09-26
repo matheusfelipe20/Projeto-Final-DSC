@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 
 import br.ufpb.dcx.projetofinal.DTO.CampanhaRequestDTO;
 import br.ufpb.dcx.projetofinal.DTO.CampanhaResponseDTO;
+import br.ufpb.dcx.projetofinal.DTO.DoacaoRequestDTO;
 import br.ufpb.dcx.projetofinal.Entidades.Campanha;
+import br.ufpb.dcx.projetofinal.Entidades.Doacao;
 import br.ufpb.dcx.projetofinal.Entidades.RoleUser;
 import br.ufpb.dcx.projetofinal.Entidades.Usuario;
 import br.ufpb.dcx.projetofinal.Excecoes.CampaignAlreadyExistsException;
@@ -19,9 +21,11 @@ import br.ufpb.dcx.projetofinal.Excecoes.CampanhaNotFoundException;
 import br.ufpb.dcx.projetofinal.Excecoes.InvalidCampaignDescription;
 import br.ufpb.dcx.projetofinal.Excecoes.InvalidCampaignMeta;
 import br.ufpb.dcx.projetofinal.Excecoes.InvalidCampaignTitle;
+import br.ufpb.dcx.projetofinal.Excecoes.InvalidDonationAmountException;
 import br.ufpb.dcx.projetofinal.Excecoes.NotAuthorizedException;
 import br.ufpb.dcx.projetofinal.Excecoes.NotFoundUserException;
 import br.ufpb.dcx.projetofinal.Repositorio.CampanhaRepositorio;
+import br.ufpb.dcx.projetofinal.Repositorio.DoacaoRepositorio;
 import br.ufpb.dcx.projetofinal.Repositorio.UsuarioRepositorio;
 
 import java.text.ParseException;
@@ -40,6 +44,9 @@ public class CampanhaServico {
 
     @Autowired
     JwtService jwtService;
+
+    @Autowired
+    DoacaoRepositorio doacaoRepositorio;
 
     public CampanhaResponseDTO CadastroCampanha(CampanhaRequestDTO campanhaRequestDTO, String authHeader) {
         Usuario usuarioLogado = this.getUser(jwtService.getTokenSubject(authHeader));
@@ -73,6 +80,7 @@ public class CampanhaServico {
             String dataInicioFormatada = dataInicial.format(formato);
             String dataFinalFormatada = dataFinal.format(formato);
             String estado = "Ativa";
+            Double saldo = 0.0;
 
             Campanha novCampanha = new Campanha(
                     estado,
@@ -80,7 +88,8 @@ public class CampanhaServico {
                     descricao,
                     meta,
                     dataInicioFormatada,
-                    dataFinalFormatada
+                    dataFinalFormatada,
+                    saldo
             );
 
             novCampanha.setUsuario(usuarioLogado);
@@ -185,7 +194,6 @@ public class CampanhaServico {
         }
     }
 
-
     public List<CampanhaResponseDTO> listarCampanhasAtivasPorTitulo() {
         List<Campanha> campanhasAtivasPorTitulo = campanhaRepositorio.findByEstado("Ativa");
         campanhasAtivasPorTitulo.sort(Comparator.comparing(Campanha::getTitulo));
@@ -218,4 +226,44 @@ public class CampanhaServico {
         }
         throw new NotFoundUserException("Usuário não encontrado","Não existe um usuário com esse email");
     }
+
+
+    public CampanhaResponseDTO realizarDoacao(String nomeCampanha, DoacaoRequestDTO doacaoRequestDTO, String authHeader) {
+        Usuario usuarioDoador = this.getUser(jwtService.getTokenSubject(authHeader));
+        List<Campanha> campanhas = campanhaRepositorio.findByTituloAndEstado(nomeCampanha, "Ativa");
+
+        if (campanhas.isEmpty()) {
+            throw new CampanhaNotFoundException("Campanha não encontrada ou não está ativa", "A campanha com o título fornecido não foi encontrada ou não está ativa.");
+        }
+
+        Campanha campanha = campanhas.get(0);
+
+        double valor = doacaoRequestDTO.getValor();
+        if (valor <= 0.0) {
+            throw new InvalidDonationAmountException("Valor de doação inválido", "O valor da doação deve ser maior que zero.");
+        }
+
+        LocalDateTime dataDoacao = LocalDateTime.now();
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String dataDoacaoFormatada = dataDoacao.format(formato);
+
+        Doacao novDoacao = new Doacao(
+            usuarioDoador,
+            campanha,
+            valor,
+            dataDoacaoFormatada
+        );
+        doacaoRepositorio.save(novDoacao);
+
+        double novoSaldo = campanha.getSaldo() + valor;
+        campanha.setSaldo(novoSaldo);
+
+        campanhaRepositorio.save(campanha);
+
+        return CampanhaResponseDTO.from(campanha);
+    }
+
+    
+    
+
 }

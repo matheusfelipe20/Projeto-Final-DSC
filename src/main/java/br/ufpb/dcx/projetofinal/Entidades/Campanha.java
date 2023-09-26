@@ -28,16 +28,19 @@ public class Campanha {
     private Double meta;
     private String dataInicio;
     private String dataFinal;
+    private Double saldo;
+
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
-    public Campanha(String estado, String titulo, String descricao, Double meta, String dataInicio, String dataFinal) {
+    public Campanha(String estado, String titulo, String descricao, Double meta, String dataInicio, String dataFinal, Double saldo) {
         this.estado = estado;
         this.titulo = titulo;
         this.descricao = descricao;
         this.meta = meta;
         this.dataInicio = dataInicio;
         this.dataFinal = dataFinal;
+        this.saldo = saldo;
     }
 }

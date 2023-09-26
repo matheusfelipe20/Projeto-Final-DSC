@@ -11,4 +11,5 @@ public interface CampanhaRepositorio extends JpaRepository<Campanha, Long> {
     Optional<Campanha> findByTitulo(String titulo);
     boolean existsByTitulo(String titulo);
     List<Campanha> findByEstado(String estado);
+    List<Campanha> findByTituloAndEstado(String titulo, String estado);
 }
