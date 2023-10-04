@@ -11,12 +11,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.ufpb.dcx.projetofinal.DTO.UsuarioRequestDTO;
 import br.ufpb.dcx.projetofinal.DTO.UsuarioResponseDTO;
 import br.ufpb.dcx.projetofinal.Servicos.UsuarioServico;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 @RestController
@@ -25,7 +31,14 @@ public class UsuarioController {
     @Autowired
     UsuarioServico usuarioServico;
 
-    //Listar o perfil de informação daquele usuario
+    @RequestMapping(value = "/api/usuarios/perfil/{email}", method = RequestMethod.GET, produces="application/json")
+    @Operation(summary = "Recupera o perfil do usuário",
+            description = "É possível recuperar os dados do usuário que está logado no sistema",
+            security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retorna os dados do usuário", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Usuário não tem permissão para acessar este recurso")
+    })
     @GetMapping("/api/usuarios/perfil/{email}")
     @ResponseStatus(code= HttpStatus.OK)
     public UsuarioResponseDTO getUser(@PathVariable String email, @RequestHeader("Authorization") String header) {
@@ -38,7 +51,14 @@ public class UsuarioController {
         return usuarioServico.AtualizarUsuario(email, usuarioRequestDTO.getNome(),usuarioRequestDTO.getEmail(), header);
     }
 
-    //Cadastrar novo usuario
+    @Operation(summary = "Cadastra o usuário no sistema",
+            description = "Informe um email válido e único, para então " +
+                    "o cadastro ser realizado com sucesso."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Usuário cadastrado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Credenciais incorretas, verifique seus dados")
+    })
     @PostMapping("/api/cadastro")
     @ResponseStatus(code=HttpStatus.CREATED)
     public UsuarioResponseDTO CadastroUsuario(@RequestBody @Valid UsuarioRequestDTO userRequestDTO) {

@@ -21,6 +21,11 @@ import br.ufpb.dcx.projetofinal.DTO.CampanhaResponseDTO;
 import br.ufpb.dcx.projetofinal.DTO.DoacaoRequestDTO;
 import br.ufpb.dcx.projetofinal.DTO.DoacaoResponseDTO;
 import br.ufpb.dcx.projetofinal.Servicos.CampanhaServico;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 @RestController
@@ -54,42 +59,76 @@ public class CampanhaController {
         return campanhaServico.EncerrarCampanha(titulo, authHeader);
     }
 
-    //Listar Campanha a partir do filtro de data cadastrada
+    @Operation(summary = "Recupera as informações das campanhas ativas.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Retorna as campanhas que estão ativas, ordenando-as por data de cadastro.",
+                    content = @Content)
+    })
     @GetMapping("/api/campanha/data")
     public ResponseEntity<List<CampanhaResponseDTO>> listarCampanhasAtivasPorDataCadastro() {
         List<CampanhaResponseDTO> campanhas = campanhaServico.listarCampanhasAtivasPorDataCadastro();
         return ResponseEntity.ok(campanhas);
     }
 
-    //Listar campanha a partir do menor titulo
+    @Operation(summary = "Recupera as informações das campanhas ordenadas.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Retorna as campanhas ordenadas a partir do menor título.",
+                    content = @Content)
+    })
     @GetMapping("/api/campanha/titulo")
     public ResponseEntity<List<CampanhaResponseDTO>> listarCampanhasAtivasPorTitulo() {
         List<CampanhaResponseDTO> campanhas = campanhaServico.listarCampanhasAtivasPorTitulo();
         return ResponseEntity.ok(campanhas);
     }
 
-    //Listar campanhas que foram encerrada
+    @Operation(summary = "Recupera as informações das campanhas que foram ecerradas.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Retorna as campanhas que foram encerradas.",
+                    content = @Content)
+    })
     @GetMapping("/api/campanha/encerrada")
     public ResponseEntity<List<CampanhaResponseDTO>> listarCampanhasEncerradasPorDataCadastro() {
         List<CampanhaResponseDTO> campanhas = campanhaServico.listarCampanhasEncerradasPorDataCadastro();
         return ResponseEntity.ok(campanhas);
     }
 
-    //Listar campanhas que completaram a meta
+    @Operation(summary = "Recupera as informações das campanhas que completaram a meta.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Retorna as campanhas que arrecadaram o valor estabelecido na meta.",
+                    content = @Content)
+    })
     @GetMapping("/api/campanha/meta")
     public ResponseEntity<List<CampanhaResponseDTO>> listarCampanhasPorMetaConcluida() {
         List<CampanhaResponseDTO> campanhas = campanhaServico.listarCampanhasPorMetaConcluida();
         return ResponseEntity.ok(campanhas);
     }
 
-    //Listar o histórico de doações realizadas
+    @Operation(summary = "Recupera as informações do histórico de doações.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Retorna o histórico completo de doações realizadas.",
+                    content = @Content)
+    })
     @GetMapping("/api/campanha/doacoes")
     public ResponseEntity<List<DoacaoResponseDTO>> listarHistoricoDoacoes() {
         List<DoacaoResponseDTO> doacoes = campanhaServico.listarHistoricoDoacoes();
         return ResponseEntity.ok(doacoes);
     }
 
-    //Realizar uma doação a uma campanha especifica
+    @Operation(summary = "Realizar uma doação em uma campanha",
+            description = "É preciso saber o título da campanha para realizar a doação. " +
+            "Apenas usuários autenticados podem realizar uma doação",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retorna a doação atualizada com sucesso"),
+            @ApiResponse(responseCode = "403", description = "Usuário não tem permissão para acessar este recurso"),
+            @ApiResponse(responseCode = "400", description = "Valor invalido para a doação, deve ser maior que 0.0")
+    })
     @PatchMapping("/api/campanha/{nomeCampanha}/doacao")
     public CampanhaResponseDTO doacaoCampanha(@PathVariable String nomeCampanha, @RequestBody DoacaoRequestDTO doacaoRequestDTO, @RequestHeader("Authorization") String authHeader) {
         return campanhaServico.realizarDoacao(nomeCampanha, doacaoRequestDTO, authHeader);
