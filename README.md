@@ -16,7 +16,7 @@ Link para o vídeo explicativo/demonstrativo sobre o sistema e suas funcionalida
 
 ## 📄 Documentação Swagger
 Link para a documentação Swagger do projeto:  
-[Documentação do Swagger](https://google.com)
+[Documentação do Swagger](http://localhost:8081/swagger-ui.html)
 
 ## ✏️ Equipe
 | [<img src="https://avatars.githubusercontent.com/u/82915269?v=4" width=115><br><sub>Matheus Felipe B. Oliveira</sub>](https://github.com/matheusfelipe20)
