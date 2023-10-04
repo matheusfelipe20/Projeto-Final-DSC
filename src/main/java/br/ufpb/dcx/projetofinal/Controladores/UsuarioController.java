@@ -37,7 +37,7 @@ public class UsuarioController {
             security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Retorna os dados do usuário", content = @Content),
-            @ApiResponse(responseCode = "403", description = "Usuário não tem permissão para acessar este recurso")
+            @ApiResponse(responseCode = "400", description = "Usuário não tem permissão para acessar este recurso")
     })
     @GetMapping("/api/usuarios/perfil/{email}")
     @ResponseStatus(code= HttpStatus.OK)
@@ -45,7 +45,14 @@ public class UsuarioController {
         return usuarioServico.getUserByEmail(email, header);
     }
 
-    //Editar informações do perfil de usuario
+    @RequestMapping(value = "/api/usuarios/perfil/{email}", method = RequestMethod.PATCH, produces="application/json")
+    @Operation(summary = "Atualiza o perfil do usuário",
+            description = "É possível atualizar os dados do usuário que está logado no sistema. Alterar o email e o nome do usuário.",
+            security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retorna os dados do usuário", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Usuário não tem permissão para acessar este recurso")
+    })
     @PatchMapping("/api/usuarios/perfil/{email}")
     public ResponseEntity<String> atualizarUsuario(@PathVariable String email, @RequestBody UsuarioRequestDTO usuarioRequestDTO, @RequestHeader("Authorization") String header) {
         return usuarioServico.AtualizarUsuario(email, usuarioRequestDTO.getNome(),usuarioRequestDTO.getEmail(), header);
@@ -65,7 +72,14 @@ public class UsuarioController {
         return usuarioServico.CadastroUsuario(userRequestDTO);
     }
 
-    //Deletar usuario já cadastrado
+    @RequestMapping(value = "/api/usuarios/perfil/{email}", method = RequestMethod.DELETE, produces="application/json")
+    @Operation(summary = "Remover o perfil do usuário",
+            description = "É possível remover a conta do usuário que está logado no sistema.",
+            security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retorna os dados do usuário", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Usuário não tem permissão para acessar este recurso")
+    })
     @DeleteMapping("/api/usuarios/perfil/{email}")
     @ResponseStatus(code=HttpStatus.OK)
     public UsuarioResponseDTO RemoverUsuario(@PathVariable String email, @RequestHeader("Authorization") String header) {

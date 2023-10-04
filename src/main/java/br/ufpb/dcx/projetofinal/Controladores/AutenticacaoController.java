@@ -20,7 +20,7 @@ public class AutenticacaoController {
     @Autowired
     private Autenticacao autenticacao;
 
-    @PostMapping("/v1/api/login")
+    @PostMapping("/api/login")
     @Operation(summary = "Autentica o usuário previamente cadastrado.",
             description = "É preciso informar o e-mail de um usuário cadastrado no sistema e a senha " +
                     "correspondente para que um usuário seja devidamente autenticado."

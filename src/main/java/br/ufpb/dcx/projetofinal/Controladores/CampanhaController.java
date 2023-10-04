@@ -34,30 +34,68 @@ public class CampanhaController {
     @Autowired
     CampanhaServico campanhaServico;
 
-    //Cadastrar Campanha
+    @Operation(summary = "Cadastrar uma campanha",
+            description = "É possível cadastrar uma campanha de acordo com as suas necessidades" +
+            "Apenas usuários autenticados",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retorna a campanha cadastrada."),
+            @ApiResponse(responseCode = "400", description = "Não Autorizado. Você não tem autorização para acessar esse recurso."),
+    })
     @PostMapping("/api/cadastro/campanha")
     @ResponseStatus(code=HttpStatus.CREATED)
     public CampanhaResponseDTO CadastroCampanha(@RequestBody @Valid CampanhaRequestDTO campanhaRequestDTO, @RequestHeader("Authorization") String header) {
         return campanhaServico.CadastroCampanha(campanhaRequestDTO, header);
     }
 
-    //Editar Campanha já cadastrada
+    @Operation(summary = "Atualizar uma campanha",
+            description = "É preciso saber o título da campanha para realizar a atualização. " +
+            "Apenas usuários autenticados, e que seja o dono da campanha podem atualiza-la",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retorna a campanha atualizada."),
+            @ApiResponse(responseCode = "400", description = "Não Autorizado. Você não tem autorização para atualizar essa campanha."),
+            @ApiResponse(responseCode = "404", description = "A campanha com o título fornecido não foi encontrada.")
+    })
     @PatchMapping("/api/campanha/{titulo}")
     public CampanhaResponseDTO atualizarCampanha(@PathVariable String titulo, @RequestBody CampanhaRequestDTO campanhaRequestDTO, @RequestHeader("Authorization") String header) {
         return campanhaServico.AtualizarCampanha(titulo, campanhaRequestDTO, header);
     }
 
-    //Deletar Campanha já cadastrada
+
+    @Operation(summary = "Deleta uma campanha",
+            description = "É preciso saber o título da campanha para realizar a remoção. " +
+            "Apenas usuários autenticados, e que seja o dono da campanha podem deleta-la",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retorna a campanha deletada."),
+            @ApiResponse(responseCode = "400", description = "Não Autorizado. Você não tem autorização para deletar essa campanha."),
+            @ApiResponse(responseCode = "404", description = "A campanha com o título fornecido não foi encontrada.")
+    })
     @DeleteMapping("/api/campanha/{titulo}")
     public CampanhaResponseDTO deletarCampanha(@PathVariable String titulo, @RequestHeader("Authorization") String authHeader) {
         return campanhaServico.DeletarCampanha(titulo, authHeader);
     }
 
-    //Encerrar Campanha já cadastrada
-    @PatchMapping("/api/campanha/{titulo}/Encerrar")
+
+    @Operation(summary = "Encerra a campanha que está ativa",
+            description = "É preciso saber o título da campanha para encerra-la, e a campanha precisa pertencer ao usuário. " +
+            "Apenas usuários autenticados podem realizar essa ação",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retorna a campanha encerrada."),
+            @ApiResponse(responseCode = "400", description = "Não Autorizado. Você não tem autorização para encerrar essa campanha."),
+            @ApiResponse(responseCode = "404", description = "A campanha com o título fornecido não foi encontrada.")
+    })
+    @PatchMapping("/api/campanha/{titulo}/Encerra")
     public CampanhaResponseDTO EncerrarCampanha(@PathVariable String titulo, @RequestHeader("Authorization") String authHeader) {
         return campanhaServico.EncerrarCampanha(titulo, authHeader);
     }
+
 
     @Operation(summary = "Recupera as informações das campanhas ativas.")
     @ApiResponses(value = {
@@ -71,6 +109,7 @@ public class CampanhaController {
         return ResponseEntity.ok(campanhas);
     }
 
+
     @Operation(summary = "Recupera as informações das campanhas ordenadas.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
@@ -82,6 +121,7 @@ public class CampanhaController {
         List<CampanhaResponseDTO> campanhas = campanhaServico.listarCampanhasAtivasPorTitulo();
         return ResponseEntity.ok(campanhas);
     }
+
 
     @Operation(summary = "Recupera as informações das campanhas que foram ecerradas.")
     @ApiResponses(value = {
@@ -95,6 +135,7 @@ public class CampanhaController {
         return ResponseEntity.ok(campanhas);
     }
 
+
     @Operation(summary = "Recupera as informações das campanhas que completaram a meta.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
@@ -107,6 +148,7 @@ public class CampanhaController {
         return ResponseEntity.ok(campanhas);
     }
 
+
     @Operation(summary = "Recupera as informações do histórico de doações.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
@@ -118,6 +160,7 @@ public class CampanhaController {
         List<DoacaoResponseDTO> doacoes = campanhaServico.listarHistoricoDoacoes();
         return ResponseEntity.ok(doacoes);
     }
+
 
     @Operation(summary = "Realizar uma doação em uma campanha",
             description = "É preciso saber o título da campanha para realizar a doação. " +
