@@ -11,7 +11,7 @@ Portanto, nesse contexto foi desenvolvido o "meajude.com", um sistema projetado 
 
 ## 🎥 Vídeo do projeto
 Link para o vídeo explicativo/demonstrativo sobre o sistema e suas funcionalidades:  
-[Vídeo explicando o projeto](https://google.com)
+[Vídeo explicando o projeto](https://youtu.be/jlDFv94SEhY)
 
 ## 📄 Documentação Swagger
 Link para a documentação Swagger do projeto:  
